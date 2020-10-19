@@ -1,6 +1,6 @@
-.PHONY: precommit ssh
+.PHONY: check ssh
 
-precommit:
+check:
 	pre-commit run -a
 
 ssh:
