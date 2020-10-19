@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# Environment:
+#   $SQUID_PORT
+#   $SQUID_USER
+#   $SQUID_PASSWORD
+#
+set -euEo pipefail
+
+cd ~/data/docker/squid
+
+sudo apt-get update -y
+sudo apt-get install -y apache2-utils
+echo "$SQUID_PASSWORD" | htpasswd -i -c "./etc/passwd" "$SQUID_USER"
+
+cat <<EOF >.env
+# SQUID
+SQUID_PORT=${SQUID_PORT}
+EOF
+
+# Start openvpn service
+docker-compose up -d squid

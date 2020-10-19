@@ -1,0 +1,14 @@
+version: "3.3"
+services:
+  squid:
+    image: "sameersbn/squid:3.5.27-2"
+    container_name: squid
+    restart: always
+    ports:
+      - "${SQUID_PORT}:3128"
+    volumes:
+      - "./etc/squid.conf:/etc/squid/squid.conf:ro"
+      - "./etc/passwd:/etc/squid/passwd:ro"
+      - "squid_cache:/var/spool/squid"
+volumes:
+  squid_cache:

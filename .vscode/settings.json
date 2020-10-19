@@ -1,0 +1,7 @@
+{
+  "cSpell.enabled": false,
+  "files.exclude": {
+    "**/*.tfstate*": true,
+    "**/.terraform": true
+  }
+}
