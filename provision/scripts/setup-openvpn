@@ -13,11 +13,12 @@ cd ~/data/docker/openvpn
 cat <<EOF >.env
 # OPENVPN
 OPENVPN_PORT=${OPENVPN_PORT}
+OPENVPN_PROTOCOL=${OPENVPN_PROTOCOL}
 EOF
 
 # Initialize the configuration files and certificates
 docker-compose run --rm openvpn \
-  ovpn_genconfig -u "udp://${PUBLIC_IP}"
+  ovpn_genconfig -u "${OPENVPN_PROTOCOL}://${PUBLIC_IP}"
 
 echo "$PUBLIC_IP" |
   docker-compose run --rm openvpn \
@@ -38,7 +39,8 @@ docker-compose run --rm --entrypoint /bin/sh \
 # docker exec "$vpn_container" sh -c 'echo \"duplicate-cn\" >> /etc/openvpn/openvpn.conf'
 
 # Replaces vpn host port
-sed -i "s/1194 udp/${OPENVPN_PORT} udp/" ~/"${OPENVPN_CLIENT_NAME}.ovpn"
+sed -i "s/1194 ${OPENVPN_PROTOCOL}/${OPENVPN_PORT} ${OPENVPN_PROTOCOL}/" \
+  ~/"${OPENVPN_CLIENT_NAME}.ovpn"
 
 # Start openvpn service
-docker-compose up -d openvpn
+docker-compose up -d

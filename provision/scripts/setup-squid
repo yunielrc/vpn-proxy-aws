@@ -19,4 +19,4 @@ SQUID_PORT=${SQUID_PORT}
 EOF
 
 # Start openvpn service
-docker-compose up -d squid
+docker-compose up -d

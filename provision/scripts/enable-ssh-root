@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+sudo -s <<EOF
+echo 'PermitRootLogin without-password' >>/etc/ssh/sshd_config
+cat /home/ubuntu/.ssh/authorized_keys >/root/.ssh/authorized_keys
+systemctl restart sshd.service
+EOF

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Environment:
+#   $SS_PORT
+#   $SS_PASSWORD
+#
+set -euEo pipefail
+
+cd ~/data/docker/ss-server
+
+# Start openvpn service
+docker-compose up -d
