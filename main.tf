@@ -22,13 +22,13 @@ resource "aws_key_pair" "key_pair" {
 resource "aws_security_group" "security_group" {
   name = "${local.id}-security-group-${local.sufix}"
 
-  ingress {
-    description = "ss server udp"
-    from_port   = var.ss_port
-    to_port     = var.ss_port
-    protocol    = "udp"
-    cidr_blocks = local.cidr_blocks
-  }
+  # ingress {
+  #   description = "ss server udp"
+  #   from_port   = var.ss_port
+  #   to_port     = var.ss_port
+  #   protocol    = "udp"
+  #   cidr_blocks = local.cidr_blocks
+  # }
 
   ingress {
     description = "ss server tcp"
