@@ -1,3 +1,7 @@
+variable "name" {
+  default = "vpn-proxy"
+}
+
 variable "region" {
   default = "us-east-2"
 }

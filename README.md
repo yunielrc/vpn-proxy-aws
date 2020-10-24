@@ -31,6 +31,7 @@ terraform apply
 |------|-------------|------|---------|:--------:|
 | amis | n/a | `map(string)` | <pre>{<br>  "us-east-2": "ami-01237fce26136c8cc"<br>}</pre> | no |
 | instance\_type | n/a | `string` | `"t2.micro"` | no |
+| name | n/a | `string` | `"vpn-proxy"` | no |
 | openvpn\_client\_name | n/a | `string` | `"vpn-profile"` | no |
 | openvpn\_port | n/a | `number` | `1194` | no |
 | openvpn\_protocol | n/a | `string` | `"udp"` | no |

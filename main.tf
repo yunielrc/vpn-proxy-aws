@@ -1,5 +1,4 @@
 locals {
-  id          = "vpn-proxy-aws"
   user        = "ubuntu"
   cidr_blocks = ["0.0.0.0/0"]
   sufix       = formatdate("YYYYMMDDhhmmss", timestamp())
@@ -14,13 +13,13 @@ provider "aws" {
   # secret_key = var.aws_secret_key
 }
 resource "aws_key_pair" "key_pair" {
-  key_name   = "${local.id}-key-pair-${local.sufix}"
+  key_name   = "${var.name}-key-pair-${local.sufix}"
   public_key = file("~/.ssh/id_rsa.pub")
   # public_key = var.public_key
 }
 
 resource "aws_security_group" "security_group" {
-  name = "${local.id}-security-group-${local.sufix}"
+  name = "${var.name}-security-group-${local.sufix}"
 
   # ingress {
   #   description = "ss server udp"
@@ -55,6 +54,14 @@ resource "aws_security_group" "security_group" {
   }
 
   ingress {
+    description = "icmp"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "icmp"
+    cidr_blocks = local.cidr_blocks
+  }
+
+  ingress {
     description = "ssh"
     from_port   = 22
     to_port     = 22
@@ -76,6 +83,10 @@ resource "aws_instance" "instance" {
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.security_group.id]
   key_name               = aws_key_pair.key_pair.id
+
+  tags = {
+    Name = var.name
+  }
 
   connection {
     type = "ssh"
