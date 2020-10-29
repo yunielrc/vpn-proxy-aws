@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -euEo pipefail
+
+git clone https://github.com/yunielrc/dockerfiles.git
+cd dockerfiles
+
+echo 'BUILD_PUSHALL_RMI=true' >.env
+make build-pushall

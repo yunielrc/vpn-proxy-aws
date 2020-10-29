@@ -117,9 +117,9 @@ resource "aws_instance" "instance" {
     inline = [
       <<-EOT
         chmod +x /tmp/scripts/setup-openvpn-ssserver
-        PUBLIC_IP=${self.public_ip}
+        PUBLIC_IP=${self.public_ip} \
         OPENVPN_CLIENT_NAME=${var.openvpn_client_name} \
-        SS_CLIENT_PORT=${var.ss_client_port}
+        SS_CLIENT_PORT=${var.ss_client_port} \
         SS_PORT=${var.ss_port} \
         SS_PASSWORD=${var.ss_password} \
         /tmp/scripts/setup-openvpn-ssserver
