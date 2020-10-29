@@ -38,14 +38,6 @@ resource "aws_security_group" "security_group" {
   }
 
   ingress {
-    description = "open vpn"
-    from_port   = var.openvpn_port
-    to_port     = var.openvpn_port
-    protocol    = var.openvpn_protocol
-    cidr_blocks = local.cidr_blocks
-  }
-
-  ingress {
     description = "http proxy"
     from_port   = var.squid_port
     to_port     = var.squid_port
@@ -89,10 +81,11 @@ resource "aws_instance" "instance" {
   }
 
   connection {
-    type = "ssh"
-    host = self.public_dns
-    user = local.user
-    # agent = true
+    type    = "ssh"
+    host    = self.public_ip
+    user    = local.user
+    timeout = "1m"
+    agent   = true
   }
 
   # PROVISION
@@ -119,9 +112,19 @@ resource "aws_instance" "instance" {
     inline = ["wget -qO - https://git.io/JJaKZ?=docker-ubuntu | bash"]
   }
 
-  # setup squid, ss-server (shadowsocks-rust server)
+  # setup squid, openvpn-ssserver (shadowsocks-rust server)
   provisioner "remote-exec" {
     inline = [
+      <<-EOT
+        chmod +x /tmp/scripts/setup-openvpn-ssserver
+        PUBLIC_IP=${self.public_ip}
+        OPENVPN_CLIENT_NAME=${var.openvpn_client_name} \
+        SS_CLIENT_PORT=${var.ss_client_port}
+        SS_PORT=${var.ss_port} \
+        SS_PASSWORD=${var.ss_password} \
+        /tmp/scripts/setup-openvpn-ssserver
+      EOT
+      ,
       <<-EOT
         chmod +x /tmp/scripts/setup-squid
         SQUID_PORT=${var.squid_port} \
@@ -130,46 +133,6 @@ resource "aws_instance" "instance" {
         /tmp/scripts/setup-squid
       EOT
       ,
-      <<-EOT
-        chmod +x /tmp/scripts/setup-ss-server
-        SS_PORT=${var.ss_port} \
-        SS_PASSWORD=${var.ss_password} \
-        /tmp/scripts/setup-ss-server
-      EOT
-    ]
-  }
-
-  ## disable dns service if openvpn uses port 53
-  provisioner "remote-exec" {
-    inline = [
-      <<-EOT
-      %{if var.openvpn_port == 53}
-        docker pull kylemanna/openvpn:2.4
-        systemctl disable systemd-resolved.service --now
-      %{else}
-        :
-      %{endif}
-      EOT
-    ]
-    connection {
-      type = "ssh"
-      host = self.public_dns
-      user = "root"
-      # agent = true
-    }
-  }
-
-  # setup openvpn
-  provisioner "remote-exec" {
-    inline = [
-      <<-EOT
-        chmod +x /tmp/scripts/setup-openvpn
-        PUBLIC_IP=${self.public_ip} \
-        OPENVPN_PORT=${var.openvpn_port} \
-        OPENVPN_CLIENT_NAME=${var.openvpn_client_name} \
-        OPENVPN_PROTOCOL=${var.openvpn_protocol} \
-        /tmp/scripts/setup-openvpn
-      EOT
     ]
   }
 

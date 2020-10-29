@@ -49,19 +49,15 @@ variable "squid_password" {
 
 # OPENVPN
 
-variable "openvpn_port" {
-  default = 1194
-}
-
-variable "openvpn_protocol" {
-  default = "udp"
-}
-
 variable "openvpn_client_name" {
-  default = "vpn-profile"
+  default = "client-profile"
 }
 
 # SHADOWSOCKS (SS) SERVER
+
+variable "ss_client_port" {
+  default = 1080
+}
 
 variable "ss_port" {
   default = 443

@@ -32,14 +32,13 @@ terraform apply
 | amis | n/a | `map(string)` | <pre>{<br>  "us-east-2": "ami-01237fce26136c8cc"<br>}</pre> | no |
 | instance\_type | n/a | `string` | `"t2.micro"` | no |
 | name | n/a | `string` | `"vpn-proxy"` | no |
-| openvpn\_client\_name | n/a | `string` | `"vpn-profile"` | no |
-| openvpn\_port | n/a | `number` | `1194` | no |
-| openvpn\_protocol | n/a | `string` | `"udp"` | no |
+| openvpn\_client\_name | n/a | `string` | `"client-profile"` | no |
 | profile | n/a | `string` | `"default"` | no |
 | region | n/a | `string` | `"us-east-2"` | no |
 | squid\_password | n/a | `string` | n/a | yes |
 | squid\_port | n/a | `number` | `3128` | no |
 | squid\_user | n/a | `string` | n/a | yes |
+| ss\_client\_port | n/a | `number` | `1080` | no |
 | ss\_password | n/a | `string` | n/a | yes |
 | ss\_port | n/a | `number` | `443` | no |
 

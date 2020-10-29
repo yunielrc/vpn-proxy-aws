@@ -1,0 +1,26 @@
+version: "3.3"
+services:
+  openvpn:
+    image: "kylemanna/openvpn:2.4"
+    container_name: openvpn
+    restart: always
+    expose:
+      - "1194"
+    volumes:
+      - "openvpn_data:/etc/openvpn"
+    cap_add:
+      - NET_ADMIN
+
+  ssserver:
+    image: yunielrc/shadowsocks-rust-server
+    restart: always
+    container_name: ssserver
+    environment:
+      - "SS_PASSWORD=${SS_PASSWORD}"
+      - "SS_PLUGIN=v2ray-plugin"
+      - "SS_PLUGIN_OPTS=server"
+    ports:
+      - "${SS_PORT}:8388"
+
+volumes:
+  openvpn_data:

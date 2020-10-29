@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+#
+# All services
+#
+# Environment:
+#   $PUBLIC_IP
+#   $OPENVPN_CLIENT_NAME
+#   $SS_CLIENT_PORT
+#   $SS_PORT
+#   $SS_PASSWORD
+
+set -euEo pipefail
+
+cd ~/data/docker/openvpn-ssserver
+
+#
+# OpenVPN Server
+#
+# Environment:
+#   $SS_CLIENT_PORT
+#   $OPENVPN_CLIENT_NAME
+#
+
+readonly openvpn_host='openvpn'
+readonly openvpn_port=1194
+readonly openvpn_protocol='tcp'
+
+# Initialize the configuration files and certificates
+docker-compose run --rm openvpn \
+  ovpn_genconfig -u "${openvpn_protocol}://${openvpn_host}"
+
+echo "$openvpn_host" |
+  docker-compose run --rm openvpn \
+    ovpn_initpki nopass
+
+# Generate a client certificate without a passphrase
+docker-compose run --rm openvpn \
+  easyrsa build-client-full "${OPENVPN_CLIENT_NAME}" nopass
+
+# Retrieve the client configuration with embedded certificates
+docker-compose run --rm openvpn \
+  ovpn_getclient "${OPENVPN_CLIENT_NAME}" >~/"${OPENVPN_CLIENT_NAME}.ovpn"
+
+# Add 'duplicate-cn' option to vpn config
+docker-compose run --rm --entrypoint /bin/sh \
+  openvpn \
+  -c 'echo duplicate-cn >> /etc/openvpn/openvpn.conf'
+# docker exec "$vpn_container" sh -c 'echo \"duplicate-cn\" >> /etc/openvpn/openvpn.conf'
+
+# Replaces vpn host port on vpn client profile
+sed -i "s/1194 ${openvpn_protocol}/${openvpn_port} ${openvpn_protocol}/" \
+  ~/"${OPENVPN_CLIENT_NAME}.ovpn"
+
+# Add shadowsocks proxy support on vpn client profile
+cat <<-EOF >>~/"${OPENVPN_CLIENT_NAME}.ovpn"
+proto tcp
+socks-proxy 127.0.0.1 ${SS_CLIENT_PORT}
+
+route ${PUBLIC_IP} 255.255.255.255  net_gateway
+route 10.0.0.0       255.0.0.0        net_gateway
+route 172.16.0.0     255.240.0.0      net_gateway
+route 192.168.0.0    255.255.0.0      net_gateway
+EOF
+
+#
+# Shadowsocks server
+#
+# Environment:
+#   $SS_PORT
+#   $SS_PASSWORD
+#
+
+cat <<EOF >.env
+# SSSERVER
+SS_PORT=${SS_PORT}
+SS_PASSWORD='${SS_PASSWORD}'
+EOF
+
+# Start openvpn-ssserver
+docker-compose up -d

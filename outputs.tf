@@ -15,5 +15,5 @@ output "proxy_usage" {
 }
 
 output "closing_message" {
-  value = "Your VPN and proxy are ready!"
+  value = "Your <OpenVPN over Shadowsocks> and <HTTP Proxy> are ready!"
 }
